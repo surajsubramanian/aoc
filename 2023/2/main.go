@@ -31,16 +31,13 @@ func GetMaxEach(line string) map[string]int {
 
 func main() {
 	file, _ := os.ReadFile("input.txt")
-	red, green, blue := 12, 13, 14
 	ans := 0
-	for i, line := range strings.Split(string(file), "\n") {
+	for _, line := range strings.Split(string(file), "\n") {
 		if line == "" {
 			continue
 		}
 		maxColors := GetMaxEach(line)
-		if maxColors["red"] <= red && maxColors["green"] <= green && maxColors["blue"] <= blue {
-			ans += i + 1
-		}
+		ans += maxColors["red"] * maxColors["green"] * maxColors["blue"]
 	}
-	log.Println(ans)
+	log.Println(int(ans))
 }
