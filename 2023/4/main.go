@@ -14,16 +14,15 @@ import (
 
 var lines []string
 
-func firstLine(line string) int {
+func lineParse(line string) ([]int, []int) {
 	use := strings.Split(strings.Split(line, ": ")[1], "|")
 	wAll, hAll := strings.TrimSpace(use[0]), strings.TrimSpace(use[1])
 
 	win, have := []int{}, []int{}
-	chosen := []int{}
 	for _, w := range strings.Split(wAll, " ") {
 		temp := strings.TrimSpace(w)
 		if temp != "" {
-			t, _ := strconv.Atoi(strings.TrimSpace(w))
+			t, _ := strconv.Atoi(temp)
 			win = append(win, t)
 		}
 	}
@@ -34,23 +33,52 @@ func firstLine(line string) int {
 			have = append(have, t)
 		}
 	}
-	for _, h := range have {
-		if slices.Contains(win, h) {
-			chosen = append(chosen, h)
+	return win, have
+}
+
+func getChosen(line string) int {
+	chosen := []int{}
+	if strings.TrimSpace(line) != "" {
+		win, have := lineParse(line)
+		for _, h := range have {
+			if slices.Contains(win, h) {
+				chosen = append(chosen, h)
+			}
 		}
+		return len(chosen)
 	}
-	if len(chosen) == 0 {
-		return 0
-	}
-	return int(math.Pow(float64(2), float64(len(chosen)-1)))
+	return 0
 }
 
 func first() int {
 	result := 0
 	for _, line := range lines {
-		if strings.TrimSpace(line) != "" {
-			result += firstLine(line)
+		chosen := getChosen(line)
+		if chosen == 0 {
+			result += 0
 		}
+		result += int(math.Pow(float64(2), float64(chosen-1)))
+	}
+	return result
+}
+
+func second() int {
+	rList := []int{}
+	for i := 0; i < len(lines); i++ {
+		rList = append(rList, 1)
+	}
+	for i := 0; i < len(lines); i++ {
+		chosen := getChosen(lines[i])
+		for j := i + 1; j < i+1+chosen; j++ {
+			if j >= len(lines) {
+				continue
+			}
+			rList[j] += rList[i]
+		}
+	}
+	result := 0
+	for _, r := range rList {
+		result += r
 	}
 	return result
 }
@@ -60,12 +88,22 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	lines = strings.Split(string(file), "\n")
+	tempLines := strings.Split(string(file), "\n")
+	for _, line := range tempLines {
+		if strings.TrimSpace(line) != "" {
+			lines = append(lines, line)
+		}
+	}
 
 	var part int
 	flag.IntVar(&part, "part", 1, "part 1 or 2")
 	flag.Parse()
 
-	result := first()
-	fmt.Println("Output: ", result)
+	if part == 1 {
+		result := first()
+		fmt.Println("Output: ", result)
+	} else {
+		result := second()
+		fmt.Println("Output: ", result)
+	}
 }

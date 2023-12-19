@@ -1,33 +1,33 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestFirstLine(t *testing.T) {
 	s := []struct {
-		line string
-		want int
+		line     string
+		winWant  []int
+		haveWant []int
 	}{
 		{
-			line: "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
-			want: 8,
-		},
-		{
-			line: "Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19",
-			want: 2,
-		},
-		{
-			line: "Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1",
-			want: 2,
-		},
-		{
-			line: "Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11",
-			want: 0,
+			line:     "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
+			winWant:  []int{41, 48, 83, 86, 17},
+			haveWant: []int{83, 86, 6, 31, 17, 9, 48, 53},
 		},
 	}
 
 	for _, tt := range s {
-		if got := firstLine(tt.line); got != tt.want {
-			t.Errorf("firstLine() = %v, want %v", got, tt.want)
+		win, have := lineParse(tt.line)
+		for i := 0; i < len(tt.winWant); i++ {
+			if win[i] != tt.winWant[i] {
+				t.Errorf("win = %v, winWant %v", win, tt.winWant)
+			}
+		}
+		for i := 0; i < len(tt.haveWant); i++ {
+			if have[i] != tt.haveWant[i] {
+				t.Errorf("have = %v, haveWant %v", have, tt.haveWant)
+			}
 		}
 	}
 }
